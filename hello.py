@@ -10,6 +10,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 class User(db.Model):
+    print "in user"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     email = db.Column(db.String(120))
@@ -30,7 +31,10 @@ def hello():
 
 @app.route('/putperson')
 def putperson():
+    print "hi"
+    print "hi"
     user = User('John Doe', 'john.doe@example.com')
+    print "user created"
     db.session.add(user)
     db.session.commit()
     return "user created"
@@ -43,3 +47,6 @@ def showpeople():
         user_names.append(user.name)
     output = "\n".join(user_names)
     return output
+
+if __name__ == '__main__':
+    app.run()
