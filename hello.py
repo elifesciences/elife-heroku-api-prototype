@@ -2,6 +2,9 @@ import sys
 import os
 from flask import Flask
 import requests
+import logging, sys
+logging.basicConfig(stream=sys.stderr)
+import random
 
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -10,7 +13,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 class User(db.Model):
-    print "in user"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     email = db.Column(db.String(120))
@@ -21,6 +23,33 @@ class User(db.Model):
 
     def __repr__(self):
         return '<Name %r>' % self.name
+
+class Article(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(180))
+    doi = db.Column(db.String(120))
+    pub_date = db.Column(db.String(120))
+
+    def __init__(self, title, doi, pub_date):
+        self.title = title
+        self.doi = doi
+        self.pub_date = pub_date
+
+    def __repr__(self):
+        return '<Doi %r>' % self.doi
+
+class Term(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    term = db.Column(db.String(120))
+    term_type = db.Column(db.String(60))
+    # article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
+
+    def __init__(self, term, term_type):
+        self.term = term
+        self.term_type = term_type
+
+    def __repr__(self):
+        return '<Name %r>' % self.term
 
 @app.route('/')
 def hello():
@@ -38,6 +67,25 @@ def putperson():
     db.session.add(user)
     db.session.commit()
     return "user created"
+
+@app.route('/putarticle')
+def putarticle():
+    art = Article('This is the title', 'this is the DOI', "2014-08-10")
+    print "user created"
+    db.session.add(art)
+    db.session.commit()
+    return "article created"
+
+@app.route('/putterm')
+def putterm():
+    terms = ["gene", "hox", "peterson", "alpha"]
+    this_term = random.choice(terms)
+    term_types = ["organisim", "author keyword", "keyword"]
+    this_term_type = random.choice(term_types)
+    term = Term(this_term, this_term_type)
+    db.session.add(term)
+    db.session.commit()
+    return "created term"
 
 @app.route('/showperson')
 def showpeople():
