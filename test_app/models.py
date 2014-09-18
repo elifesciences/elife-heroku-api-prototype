@@ -6,17 +6,10 @@ article_taggings = db.Table('article_taggings',
     db.Column('term_id', db.Integer, db.ForeignKey('term.id'))
 )
 
-class User(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(80))
-	email = db.Column(db.String(120))
-
-	def __init__(self, name, email):
-		self.name = name
-		self.email = email
-
-	def __repr__(self):
-		return '<Name %r>' % self.name
+authorships = db.Table('authorships',
+	db.Column('article_id', db.Integer, db.ForeignKey('article.id')),
+	db.Column('author_id', db.Integer, db.ForeignKey('author.id'))
+)
 
 class Article(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -24,25 +17,24 @@ class Article(db.Model):
 	doi = db.Column(db.String(120))
 	pub_date = db.Column(db.String(120))
 	terms = db.relationship('Term', secondary=article_taggings,
-        backref=db.backref('article', lazy='dynamic'))
-
-	# def __init__(self, title, doi, pub_date):
-	# 	self.title = title
-	# 	self.doi = doi
-	# 	self.pub_date = pub_date
+        backref=db.backref('articles', lazy='dynamic'))
+	authors = db.relationship('Author', secondary=authorships,
+		backref=db.backref('articles', lazy='dynamic'))
 
 	def __repr__(self):
-		return '<Doi %r>' % self.doi
+		return '<Doi %r>' % self.title
+
+class Author(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(80))
+
+	def __repr__(self):
+		return '<Name %r>' % self.name
 
 class Term(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	term = db.Column(db.String(120))
 	term_type = db.Column(db.String(60))
-	article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
-
-	# def __init__(self, term, term_type):
-	#     self.term = term
-	#     self.term_type = term_type
 
 	def __repr__(self):
 		return '<Name %r>' % self.term
