@@ -53,23 +53,6 @@ def prep_authors():
 		inject_authors.append(s)
 	return inject_authors
 
-@app.route('/')
-def hello():
-	r = requests.get('http://httpbin.org/status/418')
-	times = int(os.environ.get('TIMES',3))
-	print r.text
-	return r.text * times
-
-@app.route('/putperson')
-def putperson():
-	print "hi"
-	print "hi"
-	user = models.User('John Doe', 'john.doe@example.com')
-	print "user created"
-	db.session.add(user)
-	db.session.commit()
-	return "user created"
-
 @app.route('/putarticle')
 def putarticle():
 
@@ -83,18 +66,6 @@ def putarticle():
 	db.session.add(art)
 	db.session.commit()
 	return "article created"
-
-@app.route('/putterm')
-def putterm():
-	terms = ["gene", "hox", "peterson", "alpha"]
-	this_term = random.choice(terms)
-	term_types = ["organisim", "author keyword", "keyword"]
-	this_term_type = random.choice(term_types)
-
-	term = models.Term(this_term, this_term_type)
-	db.session.add(term)
-	db.session.commit()
-	return "created term"
 
 @app.route('/showarticles')
 def showarticles():
@@ -118,14 +89,4 @@ def showarticles():
 		article_details.append(out_string)
 
 	output = "<br/>".join(article_details)
-	return output
-
-
-@app.route('/showperson')
-def showpeople():
-	all_users = models.User.query.all()
-	user_names = []
-	for user in all_users:
-		user_names.append(user.name)
-	output = "<br/>".join(user_names)
 	return output
