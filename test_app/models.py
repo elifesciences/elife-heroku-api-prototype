@@ -1,6 +1,11 @@
 from test_app import app
 from test_app import db
 
+article_taggings = db.Table('article_taggings',
+    db.Column('article_id', db.Integer, db.ForeignKey('article.id')),
+    db.Column('term_id', db.Integer, db.ForeignKey('term.id'))
+)
+
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(80))
@@ -18,12 +23,13 @@ class Article(db.Model):
 	title = db.Column(db.String(180))
 	doi = db.Column(db.String(120))
 	pub_date = db.Column(db.String(120))
-	terms = db.relationship('Term', backref = 'article', lazy = 'dynamic')
+	terms = db.relationship('Term', secondary=article_taggings,
+        backref=db.backref('article', lazy='dynamic'))
 
-	def __init__(self, title, doi, pub_date):
-		self.title = title
-		self.doi = doi
-		self.pub_date = pub_date
+	# def __init__(self, title, doi, pub_date):
+	# 	self.title = title
+	# 	self.doi = doi
+	# 	self.pub_date = pub_date
 
 	def __repr__(self):
 		return '<Doi %r>' % self.doi
