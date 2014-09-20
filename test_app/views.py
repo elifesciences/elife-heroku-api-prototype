@@ -146,6 +146,10 @@ def create_update_research_article_on_uid(uid, update_info):
 	db.session.commit()
 	return True
 
+class About(Resource):
+	def get(self):
+		return "this is a test api for eLife prototyping"
+
 class LensIndex(Resource):
 	def get(self):
 		uids = get_article_uids()
@@ -178,6 +182,7 @@ optional_parser.add_argument('pub_date', type=str, help="a date for the article"
 optional_parser.add_argument('terms', type=str, action='append', help="types of terms for the article")
 optional_parser.add_argument('authors', type=str, action='append', help="authors of the article")
 
+api.add_resource(About, '/')
 api.add_resource(ArticleList, '/articles')
 api.add_resource(Article, '/articles/uid/<string:uid>')
 api.add_resource(LensIndex, '/lens')
