@@ -183,4 +183,5 @@ optional_parser.add_argument('authors', type=str, action='append', help="authors
 api.add_resource(About, '/')
 api.add_resource(ArticleList, '/articles')
 api.add_resource(Article, '/articles/uid/<string:uid>')
-api.add_resource(LensIndex, '/lens')
+#api.add_resource(LensIndex, '/lens')
+api.add_resource(LensIndex, '/lens/documents.js')
