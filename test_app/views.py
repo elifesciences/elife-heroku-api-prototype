@@ -136,7 +136,7 @@ def get_article_representation(uid):
 			"published_at": this_article.pub_date,
 			"name": this_article.title,
 			"journal": "eLife",
-			"article_type": "Research-Article",
+			"article-type": "Research-Article",
 			"authors": author_names,
 			"keywords": keywords,
 			"subjects": subjects,
