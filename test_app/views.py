@@ -4,9 +4,87 @@ import requests
 from test_app import models
 import random
 from flask.ext.restful import reqparse, abort, Api, Resource
-from flask import jsonify
+from flask import jsonify, Response
+import json
 
 api = Api(app)
+
+INDEX_SCHEMA = {
+    "_id": "/type/article",
+    "name": "Projects",
+    "properties": {
+      "name": {
+        "name": "Article Name",
+        "type": "string",
+        "unique": True
+      },
+      "journal": {
+        "name": "Journal",
+        "type": "string",
+        "unique": True
+      },
+      "authors": {
+        "name": "Author",
+        "type": "string",
+        "unique": False,
+        "meta": {
+          "details": True
+        }
+      },
+      "published_at": {
+        "name": "Published Date",
+        "type": "date",
+        "unique": True
+      },
+      "image": {
+        "name": "Image",
+        "type": "string",
+        "unique": True
+      },
+      "abstract": {
+        "name": "Abstract",
+        "type": "string",
+        "unique": True
+      },
+      "article-type": {
+        "name": "Article Type",
+        "type": "string",
+        "unique": True,
+        "meta": {
+          "facet": True,
+          "details": True
+        }
+      },
+      "organisms": {
+        "name": "Organisms",
+        "type": "string",
+        "unique": False,
+        "meta": {
+          "facet": True,
+          "details": True
+        }
+      },
+      "subjects": {
+        "name": "Subjects",
+        "type": "string",
+        "unique": False,
+        "meta": {
+          "facet": True,
+          "details": True
+        }
+      },
+      "keywords": {
+        "name": "Keywords",
+        "type": "string",
+        "unique": False,
+        "meta": {
+          "facet": False,
+          "details": True
+        }
+      }
+    }
+  }
+
 
 @app.route('/showarticles')
 def showarticles():
@@ -151,8 +229,10 @@ class About(Resource):
 class LensIndex(Resource):
 	def get(self):
 		uids = get_article_uids()
-		lens_index = generate_lens_index(uids)
-		return jsonify(objects=lens_index)
+		result = {};
+		result['type'] = INDEX_SCHEMA
+		result['objects'] = generate_lens_index(uids)
+		return jsonify(result)
 
 class ArticleList(Resource):
 	def get(self):
@@ -184,4 +264,19 @@ api.add_resource(About, '/')
 api.add_resource(ArticleList, '/articles')
 api.add_resource(Article, '/articles/uid/<string:uid>')
 #api.add_resource(LensIndex, '/lens')
-api.add_resource(LensIndex, '/lens/documents.js')
+
+def jsonp_wrapper(result):
+	return "if (!window.handleDocList) { console.error('Could not find JSONP callback.'); } else { window.handleDocList(" + result +"); }"
+
+@app.route("/lens/documents.js")
+def lens_index():
+	index = LensIndex()
+	uids = get_article_uids()
+	result = {};
+	result['type'] = INDEX_SCHEMA
+	result['objects'] = generate_lens_index(uids)
+	data = jsonp_wrapper(json.dumps(result, indent=2))
+	resp = Response(response=data,
+		status=200,
+		mimetype="application/javascript")
+	return resp
