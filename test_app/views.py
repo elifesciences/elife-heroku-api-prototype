@@ -54,8 +54,7 @@ def get_article_representation(uid):
 	keywords = unpack_terms_from_article(this_article, "keywords")
 	subjects = unpack_terms_from_article(this_article, "subjects")
 	organisms = unpack_terms_from_article(this_article, "organisms")
-	rep = [
-			{"_id": this_article.doi,
+	rep = {"_id": this_article.doi,
 			"published_at": this_article.pub_date,
 			"name": this_article.title,
 			"journal": "eLife",
@@ -66,7 +65,6 @@ def get_article_representation(uid):
 			"organisms": organisms,
 			"url": "documents/" + uid
 			}
-	]
 	return rep
 
 def generate_lens_index(uids):
