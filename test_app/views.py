@@ -85,31 +85,6 @@ INDEX_SCHEMA = {
     }
   }
 
-
-@app.route('/showarticles')
-def showarticles():
-	all_articles = models.Article.query.all()
-	article_details = []
-	for article in all_articles:
-		out_string = article.title
-
-		terms = article.terms
-		term_string = ""
-		for t in terms:
-			term_string += " " + t.term
-		out_string = out_string + " " + term_string
-
-		authors = article.authors
-		author_string = ""
-		for a in authors:
-			author_string += " " + a.name
-		out_string = out_string + " " + author_string
-
-		article_details.append(out_string)
-
-	output = "<br/>".join(article_details)
-	return output
-
 def jsonp_wrapper(result):
 	return "if (!window.handleDocList) { console.error('Could not find JSONP callback.'); } else { window.handleDocList(" + result +"); }"
 
