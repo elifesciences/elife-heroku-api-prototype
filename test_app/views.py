@@ -110,6 +110,9 @@ def showarticles():
 	output = "<br/>".join(article_details)
 	return output
 
+def jsonp_wrapper(result):
+	return "if (!window.handleDocList) { console.error('Could not find JSONP callback.'); } else { window.handleDocList(" + result +"); }"
+
 def unpack_authors_from_article(article):
 	authors = article.authors
 	author_names = []
@@ -265,8 +268,6 @@ api.add_resource(ArticleList, '/articles')
 api.add_resource(Article, '/articles/uid/<string:uid>')
 #api.add_resource(LensIndex, '/lens')
 
-def jsonp_wrapper(result):
-	return "if (!window.handleDocList) { console.error('Could not find JSONP callback.'); } else { window.handleDocList(" + result +"); }"
 
 @app.route("/lens/documents.js")
 def lens_index():
