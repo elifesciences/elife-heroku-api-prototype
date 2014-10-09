@@ -210,7 +210,11 @@ class LensIndex(Resource):
 		result = {};
 		result['type'] = INDEX_SCHEMA
 		result['objects'] = generate_lens_index(uids)
-		return jsonify(result)
+		data = jsonp_wrapper(json.dumps(result, indent=2))
+		resp = Response(response=data,
+			status=200,
+			mimetype="application/javascript")
+		return resp
 
 class ArticleList(Resource):
 	def get(self):
@@ -241,18 +245,4 @@ optional_parser.add_argument('authors', type=str, action='append', help="authors
 api.add_resource(About, '/')
 api.add_resource(ArticleList, '/articles')
 api.add_resource(Article, '/articles/uid/<string:uid>')
-#api.add_resource(LensIndex, '/lens')
-
-
-@app.route("/lens/documents.js")
-def lens_index():
-	index = LensIndex()
-	uids = get_article_uids()
-	result = {};
-	result['type'] = INDEX_SCHEMA
-	result['objects'] = generate_lens_index(uids)
-	data = jsonp_wrapper(json.dumps(result, indent=2))
-	resp = Response(response=data,
-		status=200,
-		mimetype="application/javascript")
-	return resp
+api.add_resource(LensIndex, '/lens/documents.js')
