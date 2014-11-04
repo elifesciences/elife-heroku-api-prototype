@@ -5,9 +5,10 @@ import requests
 import json
 import logging
 import time
+import os
+import argparse
+import pdb
 
-xml_dir = "/Users/ian/Dropbox/code/public-code/elife-articles/"
-api_base_url = "http://hidden-sea-1357.herokuapp.com/"
 
 def get_doi(soup):
 	doi = nlm.doi(soup)
@@ -60,8 +61,11 @@ def get_uid_from_doi(doi):
 	uid = doi.split(".")[-1]
 	return uid
 
-def get_article_details(article):
+def get_article_details(article, api_base_url):
+	#TODO: separate detail extraction from api upload
+
 	soup = nlm.parse_document(article)
+
 	uid = get_uid_from_doi(get_doi(soup))
 	title = get_title(soup)
 	pub_date = get_date_article(soup)
@@ -78,19 +82,33 @@ def get_article_details(article):
 			  "terms" : all_keywords
 			}
 
-	print params
 	api_endpoint = api_base_url + "articles/uid/"+str(uid)
-	print api_endpoint
 	r = requests.put(api_endpoint, params=params)
-	print r.text
 
 def main():
+
+	xml_dir = os.environ["XML_PATH"]
+	heroku_api_base = os.environ["HEROKU_BASE_URL"]
+	local_api_base = os.environ["LOCAL_BASE_URL"]
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-l", "--location", help="`l` sets this script to populate a local app instance, `h` populates the heroku app ")
+	args = parser.parse_args()
+
+
+	if args.location == "l":
+		api_base_url = local_api_base
+	elif args.location == "h":
+		api_base_url = heroku_api_base
+
+	print api_base_url
+
 	articles = glob(xml_dir+"*.xml")
-	for article in articles[30:200]:
-		time.sleep(2)
-		try:
-			get_article_details(article)
-		except:
+	for article in articles[30:40]:
+	 	try:
+			get_article_details(article, api_base_url)
+			print "laoded " + article
+	 	except:
 			print "screwed up on " + article
 
 if __name__ == '__main__':
